@@ -1,0 +1,8 @@
+README.md
+main.py
+pyproject.toml
+cargo_install_typst.egg-info/PKG-INFO
+cargo_install_typst.egg-info/SOURCES.txt
+cargo_install_typst.egg-info/dependency_links.txt
+cargo_install_typst.egg-info/entry_points.txt
+cargo_install_typst.egg-info/top_level.txt
