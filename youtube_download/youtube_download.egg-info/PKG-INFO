@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: youtube-download
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+
+# uv
+
+## run
+
+uv build
+uv tool install dist/youtube_download-0.1.0-py3-none-any.whl

@@ -1,0 +1,8 @@
+README.md
+main.py
+pyproject.toml
+youtube_download.egg-info/PKG-INFO
+youtube_download.egg-info/SOURCES.txt
+youtube_download.egg-info/dependency_links.txt
+youtube_download.egg-info/entry_points.txt
+youtube_download.egg-info/top_level.txt
