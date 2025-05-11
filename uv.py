@@ -2,6 +2,7 @@ import argparse
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 def is_command_available(cmd):
     return shutil.which(cmd) is not None
@@ -9,45 +10,38 @@ def is_command_available(cmd):
 def is_uv_installed():
     return is_command_available("uv")
 
-def install_uv(force=False, use_git=False):
-    if not is_command_available("cargo"):
-        print("❌ 未找到 cargo，请先安装 Rust：https://www.rust-lang.org/tools/install")
-        sys.exit(1)
-
+def install_uv(force=False):
     if is_uv_installed() and not force:
-        print("✅ uv 已安装。")
+        print("✅ uv 已安装，跳过安装。")
         return
 
-    cmd = ["cargo", "install"]
-    if use_git:
-        cmd.extend(["--git", "https://github.com/astral-sh/uv"])
-    else:
-        cmd.append("uv")
-
-    if force:
-        cmd.append("--force")
-
     try:
-        print(f"📦 {'从 Git 安装' if use_git else '使用 cargo 安装'} uv...")
-        subprocess.run(cmd, check=True)
-        print("✅ uv 安装完成，你可以运行 `uv` 使用它。")
+        print("📦 正在使用官方安装脚本安装 uv ...")
+        subprocess.run(
+            "curl -LsSf https://astral.sh/uv/install.sh | sh",
+            shell=True,
+            check=True,
+        )
+        print("✅ uv 安装完成，你可以运行 `uv` 来使用它。")
     except subprocess.CalledProcessError:
-        print("❌ 安装 uv 失败，请检查错误信息。")
+        print("❌ 安装 uv 失败，请检查网络连接或 curl 输出。")
         sys.exit(1)
 
 def uninstall_uv():
-    if not is_command_available("cargo"):
-        print("❌ 未找到 cargo，请先安装 Rust。")
-        sys.exit(1)
+    uv_path = shutil.which("uv")
+    if not uv_path:
+        print("⚠️ 未检测到 uv，无需卸载。")
+        return
 
     try:
-        subprocess.run(["cargo", "uninstall", "uv"], check=True)
-        print("🗑️ uv 已卸载。")
-    except subprocess.CalledProcessError:
-        print("⚠️ 卸载失败，可能未安装 uv 或 cargo 出现问题。")
+        print(f"🗑️ 正在卸载 uv：{uv_path}")
+        Path(uv_path).unlink()
+        print("✅ uv 已卸载。")
+    except Exception as e:
+        print(f"❌ 卸载失败：{e}")
 
 def check_uv_version():
-    if not is_command_available("uv"):
+    if not is_uv_installed():
         print("⚠️ 未检测到 uv。")
         return
 
@@ -58,14 +52,13 @@ def check_uv_version():
         print("⚠️ 无法获取 uv 版本。")
 
 def main():
-    parser = argparse.ArgumentParser(description="uv 安装/卸载/查询脚本")
+    parser = argparse.ArgumentParser(description="uv 安装/卸载/版本检查脚本")
     parser.add_argument(
         "--install", action="store_true", help="安装或更新 uv（默认行为）"
     )
     parser.add_argument("--uninstall", action="store_true", help="卸载 uv")
-    parser.add_argument("--version", action="store_true", help="显示已安装的 uv 版本")
-    parser.add_argument("--git", action="store_true", help="使用 Git 安装最新开发版")
-    parser.add_argument("--force", action="store_true", help="强制重新安装 uv")
+    parser.add_argument("--version", action="store_true", help="查看已安装版本")
+    parser.add_argument("--force", action="store_true", help="强制重新安装")
 
     args = parser.parse_args()
 
@@ -77,7 +70,7 @@ def main():
     elif args.version:
         check_uv_version()
     elif args.install:
-        install_uv(force=args.force, use_git=args.git)
+        install_uv(force=args.force)
 
 if __name__ == "__main__":
     main()
